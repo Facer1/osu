@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -48,12 +48,14 @@ jobs:
 
       - name: Build APK
         run: dotnet build osu.Android/osu.Android.csproj -c Debug -p:AndroidPackageFormat=apk -p:ApplicationId=sh.ppy.osu.tablet
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v7
-        with:
-          name: osu-tablet-v3
-          path: 'osu.Android/**/*-Signed.apk'
-          compression-level: 0
-          if-no-files-found: error
+      - name: Publish APK
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $apk = Get-ChildItem osu.Android -Recurse -Filter "*-Signed.apk" | Select-Object -First 1
+          if (!$apk) { throw "APK not found" }
+          Copy-Item $apk.FullName osu-tablet.apk
+          gh release create "tablet-${{ github.run_id }}" osu-tablet.apk --title "Tablet diagnostic build" --prerelease
+          
           
