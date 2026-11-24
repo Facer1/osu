@@ -47,7 +47,7 @@ jobs:
           Set-Content $file $content
 
       - name: Build APK
-        run: dotnet build osu.Android/osu.Android.csproj -c Debug -p:AndroidPackageFormat=apk -p:ApplicationId=sh.ppy.osu.tablet
+        run: dotnet build osu.Android/osu.Android.csproj -c Release -p:AndroidPackageFormat=apk -p:ApplicationId=sh.ppy.osu.tablet
       - name: Publish APK
         shell: pwsh
         env:
