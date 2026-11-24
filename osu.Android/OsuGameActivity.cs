@@ -65,6 +65,46 @@ namespace osu.Android
         private readonly OsuGameAndroid game;
 
         private bool gameCreated;
+        private long lastInputReport;
+
+private void reportInput(MotionEvent? e)
+{
+    if (e == null)
+        return;
+
+    long now = SystemClock.ElapsedRealtime();
+
+    if (now - lastInputReport < 2000)
+        return;
+
+    lastInputReport = now;
+
+    string info =
+        $"Device: {e.Device?.Name}\n" +
+        $"Source: {e.Source}\n" +
+        $"Action: {e.Action}\n" +
+        $"Tool: {e.GetToolType(0)}\n" +
+        $"X: {e.GetX():F0} Y: {e.GetY():F0}";
+
+    global::Android.Widget.Toast.MakeText(
+        this,
+        info,
+        global::Android.Widget.ToastLength.Short
+    )?.Show();
+}
+
+public override bool DispatchGenericMotionEvent(MotionEvent? e)
+{
+    reportInput(e);
+    return base.DispatchGenericMotionEvent(e);
+}
+
+public override bool DispatchTouchEvent(MotionEvent? e)
+{
+    reportInput(e);
+    return base.DispatchTouchEvent(e);
+}
+
 
         protected override Framework.Game CreateGame()
         {
