@@ -14,6 +14,13 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Checkout modified framework
+        uses: actions/checkout@v6
+        with:
+          repository: Facer1/osu-framework
+          ref: master
+          path: custom-framework
+
       - uses: actions/setup-java@v5
         with:
           distribution: microsoft
@@ -26,13 +33,26 @@ jobs:
       - name: Install Android workload
         run: dotnet workload install android
 
+      - name: Connect modified framework
+        shell: pwsh
+        run: |
+          $file = "osu.Game/osu.Game.csproj"
+          $content = Get-Content $file -Raw
+          $content = $content -replace '<PackageReference Include="ppy.osu.Framework"[^>]*/>', '<ProjectReference Include="../custom-framework/osu.Framework/osu.Framework.csproj" />'
+          Set-Content $file $content
+
+          $file = "osu.Android.props"
+          $content = Get-Content $file -Raw
+          $content = $content -replace '<PackageReference Include="ppy.osu.Framework.Android"[^>]*/>', '<ProjectReference Include="$(MSBuildThisFileDirectory)custom-framework/osu.Framework.Android/osu.Framework.Android.csproj" />'
+          Set-Content $file $content
+
       - name: Build APK
         run: dotnet build osu.Android/osu.Android.csproj -c Debug -p:AndroidPackageFormat=apk -p:ApplicationId=sh.ppy.osu.tablet
 
       - name: Upload APK
         uses: actions/upload-artifact@v7
         with:
-          name: osu-tablet
-          path: '**/*-Signed.apk'
+          name: osu-tablet-v2
+          path: 'osu.Android/**/*-Signed.apk'
           if-no-files-found: error
           
