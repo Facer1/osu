@@ -52,7 +52,8 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v7
         with:
-          name: osu-tablet-v2
+          name: osu-tablet-v3
           path: 'osu.Android/**/*-Signed.apk'
+          compression-level: 0
           if-no-files-found: error
           
