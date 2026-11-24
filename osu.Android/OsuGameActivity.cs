@@ -95,13 +95,13 @@ private void reportInput(MotionEvent? e)
 
 public override bool DispatchGenericMotionEvent(MotionEvent? e)
 {
-    reportInput(e);
+
+    
     return base.DispatchGenericMotionEvent(e);
 }
 
 public override bool DispatchTouchEvent(MotionEvent? e)
 {
-    reportInput(e);
     return base.DispatchTouchEvent(e);
 }
 
